@@ -1,6 +1,13 @@
 <template>
     <v-layout align-center justify-center row fill-height>
-        <v-text-field ref="searchInput" v-model="textToSearch" @input="searchChanged" @keyup.enter="search"></v-text-field>
+        <v-text-field 
+            ref="searchInput" 
+            v-model="textToSearch" 
+            :label="$t('search')" 
+            single-line 
+            @input="searchChanged" 
+            @keyup.enter="search">
+        </v-text-field>
 
         <v-btn flat icon color="grey darken-1" :disabled="navigateBeforeButtonDisable" @click="beforeSearchResult">
             <v-icon :title="$t('before')" style="font-size: 24px">navigate_before</v-icon>
