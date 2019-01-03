@@ -29,18 +29,27 @@
             return {
                 textToSearch: "",
                 searchResults: "",
+                forward: true,
                 navigateBeforeButtonDisable: true,
                 navigateNextButtonDisable: true
             }
         },
         mounted: function() {
             webContents.on('found-in-page', (event, result) => {
-                this.searchResults = result.activeMatchOrdinal + "/" + result.matches;
+                const matches = result.matches - 1;
+                const currentMatch = result.activeMatchOrdinal - 1;
 
-                if (result.matches > 1) {
-                    this.navigateBeforeButtonDisable = false;
-                    this.navigateNextButtonDisable = false;
+                if (currentMatch === 0) {
+                    this.goToSearchResult();
                 }
+                else {
+                    this.searchResults = currentMatch + "/" + matches;
+
+                    if (result.matches > 1) {
+                        this.navigateBeforeButtonDisable = false;
+                        this.navigateNextButtonDisable = false;
+                    }
+                }                
             });
         },
         methods: {
@@ -57,10 +66,15 @@
                 this.navigateNextButtonDisable = true;
             },
             beforeSearchResult() {
-                webContents.findInPage(this.textToSearch, {forward: false, findNext: true});
+                this.forward = false;
+                this.goToSearchResult();
             },
             nextSearchResult() {
-                webContents.findInPage(this.textToSearch, {forward: true, findNext: true});
+                this.forward = true;
+                this.goToSearchResult();
+            },
+            goToSearchResult() {
+                webContents.findInPage(this.textToSearch, {forward: this.forward, findNext: true});
             }
         }
     }
