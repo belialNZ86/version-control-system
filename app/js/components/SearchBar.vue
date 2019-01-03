@@ -4,6 +4,7 @@
             ref="searchInput" 
             v-model="textToSearch" 
             :label="$t('search')" 
+            :suffix="searchResults"
             single-line 
             @input="searchChanged" 
             @keyup.enter="search">
@@ -27,12 +28,15 @@
         data() {
             return {
                 textToSearch: "",
+                searchResults: "",
                 navigateBeforeButtonDisable: true,
                 navigateNextButtonDisable: true
             }
         },
         mounted: function() {
             webContents.on('found-in-page', (event, result) => {
+                this.searchResults = result.activeMatchOrdinal + "/" + result.matches;
+
                 if (result.matches > 1) {
                     this.navigateBeforeButtonDisable = false;
                     this.navigateNextButtonDisable = false;
