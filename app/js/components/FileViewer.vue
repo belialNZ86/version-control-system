@@ -6,6 +6,16 @@
 			</v-btn>
 
 			<v-flex xs4>
+				<v-text-field ref="searchInput" v-model="textToSearch" @input="searchChanged" @keyup.enter="search"></v-text-field>
+			</v-flex>
+			<v-btn flat icon color="grey darken-1" :disabled="navigateBeforeButtonDisable" @click="beforeSearchResult">
+				<v-icon :title="$t('before')" style="font-size: 24px">navigate_before</v-icon>
+			</v-btn>
+			<v-btn flat icon color="grey darken-1" :disabled="navigateNextButtonDisable" @click="nextSearchResult">
+				<v-icon :title="$t('next')" style="font-size: 24px">navigate_next</v-icon>
+			</v-btn>
+            
+			<v-flex xs4>
         		<v-select multiple v-model="logLevelsSelected" :items="logLevels" @change="logLevelsToShowChanged"></v-select>
 			</v-flex>
 
@@ -68,6 +78,8 @@
 	const Clusterize = require("clusterize.js");
 	const SettingsDialog = require("./SettingsDialog").default;
 	const UserPreferences = require("../userPreferences");
+	const remote = __non_webpack_require__('electron').remote;
+	const webContents = remote.getCurrentWebContents();
 
     let userPreferences = new UserPreferences();
 
@@ -88,6 +100,9 @@
 				logLevels: ["Debug", "Info", "Warning", "Error", "Fatal"],
 				logLevelsSelected: this.getLogLevelsToShow(),
 				height: this.calcHeight(),
+				textToSearch: "",
+				navigateBeforeButtonDisable: true,
+				navigateNextButtonDisable: true,
 				showDialog: false,
 				showSettings: false,
 				currentFileSettings: this.fileSettings
@@ -95,6 +110,13 @@
 		},
 		mounted: function() {
 			window.addEventListener('resize', this.handleResize);
+
+            webContents.on('found-in-page', (event, result) => {
+				if (result.matches > 1) {
+					this.navigateBeforeButtonDisable = false;
+					this.navigateNextButtonDisable = false;
+				}
+            });
 
 			this.clusterize = new Clusterize({
 				scrollElem: this.$refs.logLinesScroll,
@@ -117,6 +139,24 @@
 				this.currentFileSettings.setLogLevelsToShow(this.logLevelsSelected);
 
 				this.acceptSettings(this.currentFileSettings);
+			},
+			search(keyboardEvent) {
+				if (this.textToSearch) {
+					webContents.findInPage(this.textToSearch);
+				}
+				else {
+					webContents.stopFindInPage("clearSelection");
+				}
+			},
+			searchChanged() {
+				this.navigateBeforeButtonDisable = true;
+				this.navigateNextButtonDisable = true;
+			},
+			beforeSearchResult() {
+				webContents.findInPage(this.textToSearch, {forward: false, findNext: true});
+			},
+			nextSearchResult() {
+				webContents.findInPage(this.textToSearch, {forward: true, findNext: true});
 			},
 			clean() {
 				this.clusterize.clear();

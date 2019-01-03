@@ -11,5 +11,7 @@
     "close": "Close",
     "text": "Text",
     "background": "Background",
-    "regex": "Regular expression"
+    "regex": "Regular expression",
+    "next": "Next",
+    "before": "Before"
 }

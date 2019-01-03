@@ -11,5 +11,7 @@
     "close": "Cerrar",
     "text": "Texto",
     "background": "Fondo",
-    "regex": "Expresión regular"
+    "regex": "Expresión regular",
+    "next": "Siguiente",
+    "before": "Anterior"
 }
