@@ -39,7 +39,7 @@
                 const matches = result.matches - 1;
                 const currentMatch = result.activeMatchOrdinal - 1;
 
-                if (currentMatch === 0) {
+                if (currentMatch === 0 && matches > 1) {
                     this.goToSearchResult();
                 }
                 else {
@@ -58,6 +58,7 @@
                     webContents.findInPage(this.textToSearch);
                 }
                 else {
+                    this.searchResults = "";
                     webContents.stopFindInPage("clearSelection");
                 }
             },
